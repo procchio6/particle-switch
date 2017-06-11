@@ -7,7 +7,8 @@ class ApplicationController < ActionController::Base
       @lightOn = (@device.get("lightOn") == 1)
       render '/home'
     else
-      @error_message = 'The device is not connected!'
+      @error_message ||= 'The device is not connected!'
+      render '/error'
     end
   end
 
@@ -16,7 +17,8 @@ class ApplicationController < ActionController::Base
     if @device.connected?
       @device.call("toggleLight")
     else
-      @error_message = 'The device is not connected!'
+      @error_message ||= 'The device is not connected!'
+      render '/error'
     end
   end
 
@@ -27,8 +29,7 @@ class ApplicationController < ActionController::Base
       @device = Particle.device('pat-photon')
       @device.get_attributes
     rescue Particle::Error => error
-      @error_message = error.response.body[:error_description]
-      render '/error'
+      @error_message ||= error.response.body[:error_description]
     end
   end
 
