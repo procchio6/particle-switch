@@ -3,20 +3,35 @@ class ApplicationController < ActionController::Base
 
   def home
     set_device
-    @lightOn = (@device.get("lightOn") == 1)
-    render '/home'
+    if @device.connected?
+      @lightOn = (@device.get("lightOn") == 1)
+      render '/home'
+    else
+      @error_message = 'The device is not connected!'
+      render '/error'
+    end
   end
 
   def toggle
     set_device
-    @device.call("toggleLight")
+    if @device.connected?
+      @device.call("toggleLight")
+    else
+      @error_message = 'The device is not connected!'
+      render '/error'
+    end
   end
 
   private
 
   def set_device
-    @device = Particle.device('pat-photon')
-    @device.get_attributes
+    begin
+      @device = Particle.device('pat-photon')
+      @device.get_attributes
+    rescue Particle::Error => error
+      @error_message = error.response.body[:info]
+      render '/error'
+    end
   end
 
 end
