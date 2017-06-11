@@ -8,7 +8,6 @@ class ApplicationController < ActionController::Base
       render '/home'
     else
       @error_message = 'The device is not connected!'
-      render '/error'
     end
   end
 
@@ -18,7 +17,6 @@ class ApplicationController < ActionController::Base
       @device.call("toggleLight")
     else
       @error_message = 'The device is not connected!'
-      render '/error'
     end
   end
 
@@ -29,7 +27,7 @@ class ApplicationController < ActionController::Base
       @device = Particle.device('pat-photon')
       @device.get_attributes
     rescue Particle::Error => error
-      @error_message = error.response.body[:info]
+      @error_message = error.response.body[:error_description]
       render '/error'
     end
   end
